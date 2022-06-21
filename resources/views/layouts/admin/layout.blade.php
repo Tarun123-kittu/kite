@@ -168,6 +168,13 @@
         });
         
     </script>
+    <script>
+        $(document).ready(function() {
+            $("#menuToggle").click(function() {
+                $("body").toggleClass("open");
+            });
+        });
+    </script>
     @if (Session::has('notification'))
     <script>
         var n = new Noty({

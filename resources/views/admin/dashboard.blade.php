@@ -431,11 +431,5 @@
             }
         });
     </script>
-    <script>
-        $(document).ready(function() {
-            $("#menuToggle").click(function() {
-                $("body").toggleClass("open");
-            });
-        });
-    </script>
+   
 @endsection
