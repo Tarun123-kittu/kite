@@ -271,7 +271,7 @@
                                         @endif
 
                                         @if ($data['ctrs'])
-                                            @if ($value->format != 'Virtual OOH - Estático' || $value->format != 'Virtual OOH - GIF')
+                                            @if ($value->format != 'Virtual OOH - Estático' && $value->format != 'Virtual OOH - GIF')
                                                 <td>{{ ($value->impressions ?? 0) == 0 ? 0 : round($value->clicks / $value->impressions, 2) }}%
                                                 </td>
                                             @else
