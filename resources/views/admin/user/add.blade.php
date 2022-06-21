@@ -2,13 +2,12 @@
 @section('content')
 
 <section class="content">
-    <div class="container-fluid">
+    <div class="card">
         <!-- Small boxes (Stat box) -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card card-warning">
-                    <div class="card-header">
-                        <h2 class="card-title">Add User</h2>
+  
+             
+                    <div class="card-body pb-0">
+                        <h5 class="card-title">Add User</h5>
                     </div>
                     <form action="{{ route('users.store') }}" method="POST" id="form" enctype="multipart/form-data">
                         @csrf
@@ -61,14 +60,13 @@
                                 
                             </div>
                         </div>
-                        <div class="card-footer">
+                        <div class="mb-4">
                             <input type="submit" value="Submit" class="btn btn-success d-block mx-auto">
 
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
+            
+           
         <!-- /.row -->
 
     </div>

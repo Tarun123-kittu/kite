@@ -617,9 +617,9 @@ aside.left-panel {
     box-shadow: unset;
   }
   .navbar .navbar-nav li.active > a{
-      background: linear-gradient(118deg,#e91e63,rgba(233,30,99,.7));
-      border-radius: 7px;
-    box-shadow: 0 0 10px 1px rgba(233,30,99,.7);
+    background: linear-gradient(118deg,#3661dc,rgb(255 121 201));
+    border-radius: 7px;
+    box-shadow: 0 0 10px 1px rgb(33 183 175);
     color: #fff;
   }
     .navbar .navbar-nav > li {
@@ -2471,21 +2471,90 @@ ul.revenue_outer li {display: flex;width: 100%;}
   margin: 8px 30px;
   box-shadow: 0 5px 20px 0 rgba(0,0,0,.0509803922);
 }
-.no_report{
- margin-top: 40px;
-}
+
 .content .cm-btn {
   background: transparent;
 }
 
+.content .generate_btn button{
+  font-size: 16px;
+  padding: 10px;
+}
+.content label{
+  font-size: 14px;
+}
+.content .cm-btns,
+.content button{
+  font-size: .8rem;
+  line-height: 1;
+}
 button.btn.btn-primary.cm-btn {
   color: #007bff;
 }
 button.btn.btn-danger.cm-btn {
   color: #bd2130;
+  font-size: .8rem;
+  line-height: 1;
 }
 .content label {
   font-weight: 500;
   line-height: 1.2;
   color: #2c2c2c;
+}
+button.expo_button {
+  background: transparent;
+  font-size: .7rem;
+  line-height: 1;
+  border: 1px solid #28a745;
+  color: #28a745;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.25rem;
+}
+.content .form-control {
+  font-size: .8rem;
+  line-height: 1;
+  height: 30px;
+  font-weight: 500;
+}
+.card-body.data_tabel input[type='search'] {
+  padding: 5px;
+  border: 1px solid #ddd;
+}
+.card-body.data_tabel a {
+  font-size: .8rem;
+  line-height: 1;
+  background: transparent;
+}
+
+.card-body.data_tabel a.edit.btn-success {
+  color: #28a745;
+}
+
+.card-body.data_tabel a.edit.btn-danger {
+  color: #dc3545;
+}
+
+.card-body.data_tabel table.dataTable thead th{
+font-size: 14px;
+font-weight: 500;
+font-family: 'Montserrat';
+
+}
+.card-body.data_tabel table.dataTable tbody td {
+  padding: 8px 10px;
+  font-size: 14px;
+  font-family: 'Montserrat';
+}
+.card-body.data_tabel .table-bordered{
+  border: unset;
+  border-bottom: 1px solid #ddd;
+}
+.card-body.data_tabel td{
+border-bottom: transparent;
+}
+.content input.btn.btn-success {
+  font-size: .8rem;
+  line-height: 1;
+  background: transparent;
+  color: #28a745;
 }

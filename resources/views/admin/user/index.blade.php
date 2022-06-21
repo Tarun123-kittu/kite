@@ -1,13 +1,17 @@
 @extends('layouts.admin.layout')
 @section('content')
-<div class="container mt-5">
+<div class="content">
+ <div class="card">
+  <div class="card-body pb-0">
     <div class="d-flex py-2 align-items-center">
-        <h2 class=" flex-grow-1  ">User List</h2>
+        <h5 class=" flex-grow-1  ">User List</h5>
        <div>
-        <a href="{{ route('users.add') }}" class="btn btn-primary  ">Add User</a>
+        <a href="{{ route('users.add') }}" class="btn btn-primary cm-btns  ">Add User</a>
        </div>
     </div>
+  </div>
     
+   <div class="card-body data_tabel">
     <table class="table table-bordered yajra-datatable">
         <thead>
             <tr>
@@ -22,6 +26,8 @@
         <tbody>
         </tbody>
     </table>
+   </div>
+ </div>
 </div>
 
 @endsection

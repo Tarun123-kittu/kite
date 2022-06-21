@@ -2,13 +2,13 @@
 @section('content')
 
 <section class="content">
-    <div class="container-fluid">
+    <div class="card">
         <!-- Small boxes (Stat box) -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card card-warning">
-                    <div class="card-header">
-                        <h2 class="card-title">Update User</h2>
+
+           
+      
+                    <div class="card-body pb-0">
+                        <h6 class="card-title">Update User</h6>
                     </div>
                     <form action="{{ route('user.update',$data->id) }}" method="POST" id="form" enctype="multipart/form-data">
                         @csrf
@@ -63,14 +63,14 @@
                                 
                             </div>
                         </div>
-                        <div class="card-footer">
+                        <div class="mb-4">
                             <input type="submit" value="Update" class="btn btn-success d-block mx-auto">
 
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
+              
+          
+    
         <!-- /.row -->
 
     </div>

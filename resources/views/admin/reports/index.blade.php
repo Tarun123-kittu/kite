@@ -12,7 +12,7 @@
             </div>
             <form method="GET">
                 <div class="card_inner">
-                    <div class="card-body pb-0 ">
+                    <div class="card-body pb-0 border-bottom">
 
                         <div class="row mb-3">
                             <div class="col-md-2">
@@ -78,12 +78,12 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-1">
+                            {{-- <div class="col-md-1">
                                 <div class="form-group">
                                     <label for="" class="" style="opacity: 0;">SEARCH</label>
                                     <button class="btn btn-primary cm-btn" id="export">Export</button>
                                 </div>
-                            </div>
+                            </div> --}}
                             <div class="col-md-1">
                                 <div class="form-group">
                                     <label for="" class="" style="opacity: 0;">SEARCH</label>
@@ -101,7 +101,7 @@
 
 
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-4 border-right">
                                         <div class="form-group">
                                             <h6 class="mb-3 h6_heading">Dimensions</h6>
                                             <select name="dimension" id="" class="form-control">
@@ -203,10 +203,17 @@
 
                 </div>
             </form>
-            <div class="no_report ">
+         
 
+        </div>
+        <div class="card">
+            <div class="no_report ">
+              
                 @if (!empty($data['views'] || $data['impressions'] || $data['clicks'] || $data['engagements'] || $data['cpcvs'] || $data['ctrs'] || $data['egRates']))
-                    <table class="table">
+                <div class="table_head text-right pr-2 mb-2 pt-2">
+                    <button class="expo_button" id="export">Export</button>
+                </div>   
+                <table class="table">
                         <thead>
                             <tr>
                                 @if ($data['dimension'])
@@ -317,7 +324,6 @@
                 @endif
 
             </div>
-
         </div>
     </div>
 
