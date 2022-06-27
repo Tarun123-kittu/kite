@@ -4,7 +4,7 @@
     <div class="content">
         <!-- Animated -->
         <div class="animated fadeIn">
-
+            <?php print_r($request['creation_date'])?>
             <form method="GET">
                 <div class="row mb-3">
                     <div class="col-md-2">
@@ -12,10 +12,10 @@
                             <label for="Period">Period</label>
                             <select name="period" id="period" class="form-control">
                                 <option disabled selected>Select</option>
-                                <option value="yesterday">Yesterday</option>
-                                <option value="month">So far this month</option>
-                                <option value="seven_days">last seven days</option>
-                                <option value="last_month">Last month</option>
+                                <option {{ $request['period'] == 'yesterday' ? 'selected' : '' }} value="yesterday">Yesterday</option>
+                                <option {{ $request['period'] == 'month' ? 'selected' : '' }} value="month">So far this month</option>
+                                <option {{ $request['period'] == 'seven_days' ? 'selected' : '' }} value="seven_days">last seven days</option>
+                                <option {{ $request['period'] == 'last_month' ? 'selected' : '' }} value="last_month">Last month</option>
                                 <option value="">Custom date</option>
 
                             </select>
@@ -25,11 +25,11 @@
                         <div class="form-group">
 
                             <label for="">Date Range</label>
-                            <input type="text" value="" placeholder="Creation Date"
+                            <input type="text" value="{{ $request['creation_date'] }}" placeholder="Creation Date"
                                 class='form-control demo sel_date daterange reset' name="creation_date" id="creation_date"
-                                autocomplete="off" readonly style="background:white" disabled>
-                            <input class="reset" type="hidden" name="startDate">
-                            <input class="reset" type="hidden" name="endDate">
+                                autocomplete="off" readonly style="background:white"  disabled>
+                            <input class="reset" type="hidden" name="startDate" value="{{ $request['startDate'] ??""}}">
+                            <input class="reset" type="hidden" name="endDate" value="{{ $request['endDate'] ??""}}">
                         </div>
                     </div>
 
@@ -39,7 +39,7 @@
                             <select name="campaign" id="campaign" class="form-control">
                                 <option disabled selected>Select</option>
                                 @foreach ($data['campaign'] as $campaign)
-                                    <option value="{{ $campaign->campaign }}">{{ $campaign->campaign }}</option>
+                                    <option {{ trim($request['campaign']) == trim($campaign->campaign) ? 'selected' : '' }} value="{{ $campaign->campaign }}">{{ $campaign->campaign }}</option>
                                 @endforeach
 
                             </select>
@@ -52,7 +52,7 @@
                             <select name="format" id="format" class="form-control">
                                 <option disabled selected>Select</option>
                                 @foreach ($data['formats'] as $format)
-                                    <option value="{{ $format->format }}">{{ $format->format }}</option>
+                                    <option {{ trim($request['format']) == trim($format->format) ? 'selected' : '' }} value="{{ $format->format }}">{{ $format->format }}</option>
                                 @endforeach
 
                             </select>
@@ -161,7 +161,7 @@
                                 <div class="stat-content">
                                     <div class="text-left dib">
                                         <div class="stat-text"><span
-                                                class="count">{{ $data['cpcv']->sum('impressions') == 0 ? 0 : round($data['cpcv']->sum('views') / $data['cpcv']->sum('impressions'), 2) }}%</span>
+                                                class="count">{{ $data['cpcv']->sum('impressions') == 0 ? 0 : round(($data['cpcv']->sum('views') / $data['cpcv']->sum('impressions'))*100, 2) }}%</span>
                                         </div>
                                         <div class="stat-heading">CPCV
 
@@ -178,7 +178,7 @@
                                 <div class="stat-content">
                                     <div class="text-left dib">
                                         <div class="stat-text"><span
-                                                class="count">{{ $data['ctr']->sum('impressions') == 0 ? 0 : round($data['ctr']->sum('clicks') / $data['ctr']->sum('impressions'), 2) }}%</span>
+                                                class="count">{{ $data['ctr']->sum('impressions') == 0 ? 0 : round(($data['ctr']->sum('clicks') / $data['ctr']->sum('impressions'))*100, 2) }}%</span>
                                         </div>
                                         <div class="stat-heading">CTR</div>
                                     </div>
@@ -192,7 +192,7 @@
                                 <div class="stat-content">
                                     <div class="text-left dib">
                                         <div class="stat-text"><span
-                                                class="count">{{ $data['egRate']->sum('impressions') == 0 ? 0 : round($data['egRate']->sum('engagements') / $data['egRate']->sum('impressions'), 2) }}%</span>
+                                                class="count">{{ $data['egRate']->sum('impressions') == 0 ? 0 : round(($data['egRate']->sum('engagements') / $data['egRate']->sum('impressions'))*100, 2) }}%</span>
                                         </div>
                                         <div class="stat-heading">Engagement Rate</div>
                                     </div>

@@ -20,10 +20,10 @@
                                     <label for="Period">Period</label>
                                     <select name="period" id="period" class="form-control">
                                         <option disabled selected>Select</option>
-                                        <option value="yesterday">Yesterday</option>
-                                        <option value="month">So far this month</option>
-                                        <option value="seven_days">last seven days</option>
-                                        <option value="last_month">Last month</option>
+                                        <option {{ $request['period'] == 'yesterday' ? 'selected' : '' }} value="yesterday">Yesterday</option>
+                                        <option {{ $request['period'] == 'month' ? 'selected' : '' }} value="month">So far this month</option>
+                                        <option {{ $request['period'] == 'seven_date' ? 'selected' : '' }} value="seven_days">last seven days</option>
+                                        <option {{ $request['period'] == 'last_month' ? 'selected' : '' }} value="last_month">Last month</option>
                                         <option value="">Custom date</option>
 
                                     </select>
@@ -33,11 +33,11 @@
                                 <div class="form-group">
 
                                     <label for="">Date Range</label>
-                                    <input type="text" value="" placeholder="Creation Date"
+                                    <input type="text" value="{{ $request['creation_date'] }}" placeholder="Creation Date"
                                         class='form-control demo sel_date daterange reset' name="creation_date"
                                         id="creation_date" autocomplete="off" readonly style="background:white" disabled>
-                                    <input class="reset" type="hidden" name="startDate">
-                                    <input class="reset" type="hidden" name="endDate">
+                                    <input class="reset" type="hidden" name="startDate" value="{{ $request['startDate'] ??""}}">
+                                    <input class="reset" type="hidden" name="endDate" value="{{ $request['endDate'] ??""}}">
                                 </div>
                             </div>
 
@@ -47,7 +47,7 @@
                                     <select name="campaign" id="campaign" class="form-control">
                                         <option disabled selected>Select</option>
                                         @foreach ($data['campaign'] as $campaign)
-                                            <option value="{{ $campaign->campaign }}">{{ $campaign->campaign }}</option>
+                                            <option {{ trim($request['campaign']) == trim($campaign->campaign) ? 'selected' : '' }} value="{{ $campaign->campaign }}">{{ $campaign->campaign }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -59,7 +59,7 @@
                                     <select name="format" id="format" class="form-control">
                                         <option disabled selected>Select</option>
                                         @foreach ($data['formats'] as $format)
-                                            <option value="{{ $format->format }}">{{ $format->format }}</option>
+                                            <option {{ trim($request['format']) == trim($format->format) ? 'selected' : '' }} value="{{ $format->format }}">{{ $format->format }}</option>
                                         @endforeach
 
                                     </select>
@@ -71,7 +71,7 @@
                                     <select name="advertiser" id="advertiser" class="form-control">
                                         <option disabled selected>Select</option>
                                         @foreach ($data['advertiser'] as $advertiser)
-                                            <option value="{{ $advertiser->advertiser }}">{{ $advertiser->advertiser }}
+                                            <option {{ trim($request['advertiser']) == trim($advertiser->advertiser) ? 'selected' : '' }} value="{{ $advertiser->advertiser }}">{{ $advertiser->advertiser }}
                                             </option>
                                         @endforeach
 
@@ -106,9 +106,9 @@
                                             <h6 class="mb-3 h6_heading">Dimensions</h6>
                                             <select name="dimension" id="" class="form-control">
                                                 <option disabled selected>Select</option>
-                                                <option value="advertiser">Advertiser</option>
-                                                <option value="campaign">campaign</option>
-                                                <option value="format">Formats</option>
+                                                <option {{ trim($request['dimension']) == 'advertiser' ? 'selected' : '' }} value="advertiser">Advertiser</option>
+                                                <option {{ trim($request['dimension']) == 'campaign' ? 'selected' : '' }} value="campaign">campaign</option>
+                                                <option {{ trim($request['dimension']) == 'format' ? 'selected' : '' }} value="format">Formats</option>
                                                 {{-- <option value="country">Country</option>
                                         <option value="device">Device</option>
                                         <option value="date">Date</option>
@@ -263,7 +263,7 @@
                                         @endif
                                         @if ($data['cpcvs'])
                                             @if ($value->format == 'Branded Video (AA)' || $value->format == 'Bumper Ads / URL YouTube (KSV)' || $value->format == 'Pre Roll - In stream / URL YouTube (KSV)' || $value->format == 'Pre Roll 30¨ (AA / Programatic)')
-                                                <td>{{ ($value->impressions ?? 0) == 0 ? 0 : round($value->views / $value->impressions, 2) }}%
+                                                <td>{{ ($value->impressions ?? 0) == 0 ? 0 : round(($value->views / $value->impressions)*100, 2) }}%
                                                 </td>
                                             @else
                                                 <td>N/A</td>
@@ -272,7 +272,7 @@
 
                                         @if ($data['ctrs'])
                                             @if ($value->format != 'Virtual OOH - Estático' && $value->format != 'Virtual OOH - GIF')
-                                                <td>{{ ($value->impressions ?? 0) == 0 ? 0 : round($value->clicks / $value->impressions, 2) }}%
+                                                <td>{{ ($value->impressions ?? 0) == 0 ? 0 : round(($value->clicks / $value->impressions)*100, 2) }}%
                                                 </td>
                                             @else
                                                 <td>N/A</td>
@@ -280,7 +280,7 @@
                                         @endif
                                         @if ($data['egRates'])
                                             @if ($value->format == 'Interstitial Tradicional (AA)' || $value->format == 'Interstitial / Carousel (AA)' || $value->format == 'Interstitial / Filmstrip (AA)' || $value->format == 'Interstitial / Minigame (AA)')
-                                                <td>{{ ($value->impressions ?? 0) == 0 ? 0 : round($value->engagements / $value->impressions, 2) }}%
+                                                <td>{{ ($value->impressions ?? 0) == 0 ? 0 : round(($value->engagements / $value->impressions)*100, 2) }}%
                                                 </td>
                                             @else
                                                 <td>N/A</td>
@@ -304,15 +304,15 @@
                                         <td>{{ $data['overview']->sum('engagements') }}</td>
                                     @endif
                                     @if ($data['cpcvs'])
-                                        <td>{{ $data['cpcv']->sum('impressions') == 0 ? 0 : round($data['cpcv']->sum('views') / $data['cpcv']->sum('impressions'), 2) }}%
+                                        <td>{{ $data['cpcv']->sum('impressions') == 0 ? 0 : round(($data['cpcv']->sum('views') / $data['cpcv']->sum('impressions'))*100, 2) }}%
                                         </td>
                                     @endif
                                     @if ($data['ctrs'])
-                                        <td>{{ $data['ctr']->sum('impressions') == 0 ? 0 : round($data['ctr']->sum('clicks') / $data['ctr']->sum('impressions'), 2) }}%
+                                        <td>{{ $data['ctr']->sum('impressions') == 0 ? 0 : round(($data['ctr']->sum('clicks') / $data['ctr']->sum('impressions'))*100, 2) }}%
                                         </td>
                                     @endif
                                     @if ($data['egRates'])
-                                        <td>{{ $data['egRate']->sum('impressions') == 0 ? 0 : round($data['egRate']->sum('engagements') / $data['egRate']->sum('impressions'), 2) }}%
+                                        <td>{{ $data['egRate']->sum('impressions') == 0 ? 0 : round(($data['egRate']->sum('engagements') / $data['egRate']->sum('impressions'))*100, 2) }}%
                                         </td>
                                     @endif
                                 </tr>

@@ -259,6 +259,6 @@ class ReportsController extends Controller
 
         }
        
-        return view('admin.reports.index',compact('data'));
+        return view('admin.reports.index',compact('data','request'));
     }
 }

@@ -454,7 +454,7 @@ class AdminController extends Controller
             }
         }
 
-        return view('admin.dashboard', compact('data'));
+        return view('admin.dashboard', compact('data','request'));
     }
 
     public function login(Request $request)
