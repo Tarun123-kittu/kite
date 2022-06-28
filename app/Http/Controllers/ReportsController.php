@@ -7,15 +7,16 @@ use App\Models\Overview;
 
 class ReportsController extends Controller
 {
-    public function index(Request $request){
-       
+    public function index(Request $request)
+    {
+
         $yesterday = date('Y-m-d', strtotime("-1 days"));
         $month = date('m');
         $seven_days = date('Y-m-d', strtotime("-7 days"));
         $last_month = date("m", strtotime('-1 month'));
         $type = AuthAdmin::user()->type;
         if ($type == '1') {
-            
+
             $data = [
                 'overview' => Overview::when($request->creation_date, function ($query) use ($request) {
                     return $query->whereBetween('date', [$request->startDate, $request->endDate]);
@@ -25,20 +26,32 @@ class ReportsController extends Controller
                     return $query->where('format', $request->format);
                 })->when($request->advertiser, function ($query) use ($request) {
                     return $query->where('advertiser', $request->advertiser);
-                })->when($request->period, function ($query) use ($request , $yesterday , $month , $seven_days , $last_month) {
+                })->when($request->period, function ($query) use ($request, $yesterday, $month, $seven_days, $last_month) {
                     if ($request->period == "yesterday") {
                         return $query->where('date', $yesterday);
-                    }elseif($request->period == "month"){
-                        return $query->whereMonth('date',$month);
-                    }elseif($request->period == "seven_days"){
-                        return $query->whereBetween('date',[$seven_days , date('y-m-d')]);
-                    }else{
-                        return $query->whereMonth('date',$last_month);
+                    } elseif ($request->period == "month") {
+                        return $query->whereMonth('date', $month);
+                    } elseif ($request->period == "seven_days") {
+                        return $query->whereBetween('date', [$seven_days, date('y-m-d')]);
+                    } else {
+                        return $query->whereMonth('date', $last_month);
                     }
                 })->when($request->dimension, function ($query) use ($request) {
-                    return $query->groupBy($request->dimension)->selectRaw('ifNull(sum(impressions),0) as impressions , ifNull(sum(views),0) as views ,ifNull(sum(clicks),0) as clicks , ifNull(sum(engagements),0) as engagements , advertiser , format , campaign');
+                    if ($request->filterDate) {
+                        return $query->groupBy($request->filterDate, $request->dimension)->selectRaw('ifNull(sum(impressions),0) as impressions , ifNull(sum(views),0) as views ,ifNull(sum(clicks),0) as clicks , ifNull(sum(engagements),0) as engagements , advertiser , format , campaign , date(date) as date , day(date) as byDay , month(date) as byMonth');
+                    } else {
+                        return $query->groupBy($request->dimension)->selectRaw('ifNull(sum(impressions),0) as impressions , ifNull(sum(views),0) as views ,ifNull(sum(clicks),0) as clicks , ifNull(sum(engagements),0) as engagements , advertiser , format , campaign , date(date) as date');
+                    }
+                })->when($request->filterDate, function ($query) use ($request) {
+                    if (!$request->dimension) {
+                        if ($request->filterDate == "byDay") {
+                            return $query->groupBy('byMonth', 'byDay')->selectRaw('ifNull(sum(impressions),0) as impressions , ifNull(sum(views),0) as views ,ifNull(sum(clicks),0) as clicks , ifNull(sum(engagements),0) as engagements , advertiser , format , campaign , date(date) as date , day(date) as byDay , month(date) as byMonth');
+                        } else {
+                            return $query->groupBy($request->filterDate)->selectRaw('ifNull(sum(impressions),0) as impressions , ifNull(sum(views),0) as views ,ifNull(sum(clicks),0) as clicks , ifNull(sum(engagements),0) as engagements , advertiser , format , campaign , date(date) as date , day(date) as byDay , month(date) as byMonth');
+                        }
+                    }
                 })
-                ->get(),
+                    ->get(),
 
 
                 'campaign' => Overview::groupBy('campaign')->selectRaw('campaign')->get(),
@@ -58,15 +71,15 @@ class ReportsController extends Controller
                     return $query->where('format', $request->format);
                 })->when($request->advertiser, function ($query) use ($request) {
                     return $query->where('advertiser', $request->advertiser);
-                })->when($request->period, function ($query) use ($request , $yesterday , $month , $seven_days , $last_month) {
+                })->when($request->period, function ($query) use ($request, $yesterday, $month, $seven_days, $last_month) {
                     if ($request->period == "yesterday") {
                         return $query->where('date', $yesterday);
-                    }elseif($request->period == "month"){
-                        return $query->whereMonth('date',$month);
-                    }elseif($request->period == "seven_days"){
-                        return $query->whereBetween('date',[$seven_days , date('y-m-d')]);
-                    }else{
-                        return $query->whereMonth('date',$last_month);
+                    } elseif ($request->period == "month") {
+                        return $query->whereMonth('date', $month);
+                    } elseif ($request->period == "seven_days") {
+                        return $query->whereBetween('date', [$seven_days, date('y-m-d')]);
+                    } else {
+                        return $query->whereMonth('date', $last_month);
                     }
                 })->when($request->dimension, function ($query) use ($request) {
                     return $query->groupBy($request->dimension)->selectRaw('ifNull(sum(impressions),0) as impressions , ifNull(sum(views),0) as views ,ifNull(sum(clicks),0) as clicks , ifNull(sum(engagements),0) as engagements , advertiser');
@@ -86,19 +99,19 @@ class ReportsController extends Controller
                     return $query->where('format', $request->format);
                 })->when($request->advertiser, function ($query) use ($request) {
                     return $query->where('advertiser', $request->advertiser);
-                })->when($request->period, function ($query) use ($request , $yesterday , $month , $seven_days , $last_month) {
+                })->when($request->period, function ($query) use ($request, $yesterday, $month, $seven_days, $last_month) {
                     if ($request->period == "yesterday") {
                         return $query->where('date', $yesterday);
-                    }elseif($request->period == "month"){
-                        return $query->whereMonth('date',$month);
-                    }elseif($request->period == "seven_days"){
-                        return $query->whereBetween('date',[$seven_days , date('y-m-d')]);
-                    }else{
-                        return $query->whereMonth('date',$last_month);
+                    } elseif ($request->period == "month") {
+                        return $query->whereMonth('date', $month);
+                    } elseif ($request->period == "seven_days") {
+                        return $query->whereBetween('date', [$seven_days, date('y-m-d')]);
+                    } else {
+                        return $query->whereMonth('date', $last_month);
                     }
                 })->when($request->dimension, function ($query) use ($request) {
                     return $query->groupBy($request->dimension)->selectRaw('ifNull(sum(impressions),0) as impressions , ifNull(sum(views),0) as views ,ifNull(sum(clicks),0) as clicks , ifNull(sum(engagements),0) as engagements , advertiser');
-                })->get(),  
+                })->get(),
 
                 'ctr' => Overview::where('format', '!=', 'Virtual OOH - Estático')->where('format', '!=', 'Virtual OOH - GIF')->when($request->creation_date, function ($query) use ($request) {
                     return $query->whereBetween('date', [$request->startDate, $request->endDate]);
@@ -108,15 +121,15 @@ class ReportsController extends Controller
                     return $query->where('format', $request->format);
                 })->when($request->advertiser, function ($query) use ($request) {
                     return $query->where('advertiser', $request->advertiser);
-                })->when($request->period, function ($query) use ($request , $yesterday , $month , $seven_days , $last_month) {
+                })->when($request->period, function ($query) use ($request, $yesterday, $month, $seven_days, $last_month) {
                     if ($request->period == "yesterday") {
                         return $query->where('date', $yesterday);
-                    }elseif($request->period == "month"){
-                        return $query->whereMonth('date',$month);
-                    }elseif($request->period == "seven_days"){
-                        return $query->whereBetween('date',[$seven_days , date('y-m-d')]);
-                    }else{
-                        return $query->whereMonth('date',$last_month);
+                    } elseif ($request->period == "month") {
+                        return $query->whereMonth('date', $month);
+                    } elseif ($request->period == "seven_days") {
+                        return $query->whereBetween('date', [$seven_days, date('y-m-d')]);
+                    } else {
+                        return $query->whereMonth('date', $last_month);
                     }
                 })->when($request->dimension, function ($query) use ($request) {
                     return $query->groupBy($request->dimension)->selectRaw('ifNull(sum(impressions),0) as impressions , ifNull(sum(views),0) as views ,ifNull(sum(clicks),0) as clicks , ifNull(sum(engagements),0) as engagements , advertiser');
@@ -131,9 +144,9 @@ class ReportsController extends Controller
                 'ctrs' => $request->ctr ?? "",
                 'egRates' => $request->egRate ?? "",
                 'dimension' => $request->dimension ?? "",
+                'filterDate' => $request->filterDate ?? ""
             ];
-           
-        }else{
+        } else {
 
             $deal = [];
             foreach (AuthAdmin::user()->map as $val) {
@@ -149,18 +162,30 @@ class ReportsController extends Controller
                     return $query->where('format', $request->format);
                 })->when($request->advertiser, function ($query) use ($request) {
                     return $query->where('advertiser', $request->advertiser);
-                })->when($request->period, function ($query) use ($request , $yesterday , $month , $seven_days , $last_month) {
+                })->when($request->period, function ($query) use ($request, $yesterday, $month, $seven_days, $last_month) {
                     if ($request->period == "yesterday") {
                         return $query->where('date', $yesterday);
-                    }elseif($request->period == "month"){
-                        return $query->whereMonth('date',$month);
-                    }elseif($request->period == "seven_days"){
-                        return $query->whereBetween('date',[$seven_days , date('y-m-d')]);
-                    }else{
-                        return $query->whereMonth('date',$last_month);
+                    } elseif ($request->period == "month") {
+                        return $query->whereMonth('date', $month);
+                    } elseif ($request->period == "seven_days") {
+                        return $query->whereBetween('date', [$seven_days, date('y-m-d')]);
+                    } else {
+                        return $query->whereMonth('date', $last_month);
                     }
                 })->when($request->dimension, function ($query) use ($request) {
-                    return $query->groupBy($request->dimension)->selectRaw('ifNull(sum(impressions),0) as impressions , ifNull(sum(views),0) as views ,ifNull(sum(clicks),0) as clicks , ifNull(sum(engagements),0) as engagements , advertiser , format , campaign');
+                    if ($request->filterDate) {
+                        return $query->groupBy($request->filterDate, $request->dimension)->selectRaw('ifNull(sum(impressions),0) as impressions , ifNull(sum(views),0) as views ,ifNull(sum(clicks),0) as clicks , ifNull(sum(engagements),0) as engagements , advertiser , format , campaign , date(date) as date , day(date) as byDay , month(date) as byMonth');
+                    } else {
+                        return $query->groupBy($request->dimension)->selectRaw('ifNull(sum(impressions),0) as impressions , ifNull(sum(views),0) as views ,ifNull(sum(clicks),0) as clicks , ifNull(sum(engagements),0) as engagements , advertiser , format , campaign , date(date) as date');
+                    }
+                })->when($request->filterDate, function ($query) use ($request) {
+                    if (!$request->dimension) {
+                        if ($request->filterDate == "byDay") {
+                            return $query->groupBy('byMonth', 'byDay')->selectRaw('ifNull(sum(impressions),0) as impressions , ifNull(sum(views),0) as views ,ifNull(sum(clicks),0) as clicks , ifNull(sum(engagements),0) as engagements , advertiser , format , campaign , date(date) as date , day(date) as byDay , month(date) as byMonth');
+                        } else {
+                            return $query->groupBy($request->filterDate)->selectRaw('ifNull(sum(impressions),0) as impressions , ifNull(sum(views),0) as views ,ifNull(sum(clicks),0) as clicks , ifNull(sum(engagements),0) as engagements , advertiser , format , campaign , date(date) as date , day(date) as byDay , month(date) as byMonth');
+                        }
+                    }
                 })->get(),
 
 
@@ -181,15 +206,15 @@ class ReportsController extends Controller
                     return $query->where('format', $request->format);
                 })->when($request->advertiser, function ($query) use ($request) {
                     return $query->where('advertiser', $request->advertiser);
-                })->when($request->period, function ($query) use ($request , $yesterday , $month , $seven_days , $last_month) {
+                })->when($request->period, function ($query) use ($request, $yesterday, $month, $seven_days, $last_month) {
                     if ($request->period == "yesterday") {
                         return $query->where('date', $yesterday);
-                    }elseif($request->period == "month"){
-                        return $query->whereMonth('date',$month);
-                    }elseif($request->period == "seven_days"){
-                        return $query->whereBetween('date',[$seven_days , date('y-m-d')]);
-                    }else{
-                        return $query->whereMonth('date',$last_month);
+                    } elseif ($request->period == "month") {
+                        return $query->whereMonth('date', $month);
+                    } elseif ($request->period == "seven_days") {
+                        return $query->whereBetween('date', [$seven_days, date('y-m-d')]);
+                    } else {
+                        return $query->whereMonth('date', $last_month);
                     }
                 })->when($request->dimension, function ($query) use ($request) {
                     return $query->groupBy($request->dimension)->selectRaw('ifNull(sum(impressions),0) as impressions , ifNull(sum(views),0) as views ,ifNull(sum(clicks),0) as clicks , ifNull(sum(engagements),0) as engagements , advertiser');
@@ -209,19 +234,19 @@ class ReportsController extends Controller
                     return $query->where('format', $request->format);
                 })->when($request->advertiser, function ($query) use ($request) {
                     return $query->where('advertiser', $request->advertiser);
-                })->when($request->period, function ($query) use ($request , $yesterday , $month , $seven_days , $last_month) {
+                })->when($request->period, function ($query) use ($request, $yesterday, $month, $seven_days, $last_month) {
                     if ($request->period == "yesterday") {
                         return $query->where('date', $yesterday);
-                    }elseif($request->period == "month"){
-                        return $query->whereMonth('date',$month);
-                    }elseif($request->period == "seven_days"){
-                        return $query->whereBetween('date',[$seven_days , date('y-m-d')]);
-                    }else{
-                        return $query->whereMonth('date',$last_month);
+                    } elseif ($request->period == "month") {
+                        return $query->whereMonth('date', $month);
+                    } elseif ($request->period == "seven_days") {
+                        return $query->whereBetween('date', [$seven_days, date('y-m-d')]);
+                    } else {
+                        return $query->whereMonth('date', $last_month);
                     }
                 })->when($request->dimension, function ($query) use ($request) {
                     return $query->groupBy($request->dimension)->selectRaw('ifNull(sum(impressions),0) as impressions , ifNull(sum(views),0) as views ,ifNull(sum(clicks),0) as clicks , ifNull(sum(engagements),0) as engagements , advertiser');
-                })->get(),  
+                })->get(),
 
                 'ctr' => Overview::whereIn('deal_id', $deal)->where('format', '!=', 'Virtual OOH - Estático')->where('format', '!=', 'Virtual OOH - GIF')->when($request->creation_date, function ($query) use ($request) {
                     return $query->whereBetween('date', [$request->startDate, $request->endDate]);
@@ -231,15 +256,15 @@ class ReportsController extends Controller
                     return $query->where('format', $request->format);
                 })->when($request->advertiser, function ($query) use ($request) {
                     return $query->where('advertiser', $request->advertiser);
-                })->when($request->period, function ($query) use ($request , $yesterday , $month , $seven_days , $last_month) {
+                })->when($request->period, function ($query) use ($request, $yesterday, $month, $seven_days, $last_month) {
                     if ($request->period == "yesterday") {
                         return $query->where('date', $yesterday);
-                    }elseif($request->period == "month"){
-                        return $query->whereMonth('date',$month);
-                    }elseif($request->period == "seven_days"){
-                        return $query->whereBetween('date',[$seven_days , date('y-m-d')]);
-                    }else{
-                        return $query->whereMonth('date',$last_month);
+                    } elseif ($request->period == "month") {
+                        return $query->whereMonth('date', $month);
+                    } elseif ($request->period == "seven_days") {
+                        return $query->whereBetween('date', [$seven_days, date('y-m-d')]);
+                    } else {
+                        return $query->whereMonth('date', $last_month);
                     }
                 })->when($request->dimension, function ($query) use ($request) {
                     return $query->groupBy($request->dimension)->selectRaw('ifNull(sum(impressions),0) as impressions , ifNull(sum(views),0) as views ,ifNull(sum(clicks),0) as clicks , ifNull(sum(engagements),0) as engagements , advertiser');
@@ -254,11 +279,10 @@ class ReportsController extends Controller
                 'ctrs' => $request->ctr ?? "",
                 'egRates' => $request->egRate ?? "",
                 'dimension' => $request->dimension ?? "",
+                'filterDate' => $request->filterDate ?? ""
             ];
-
-
         }
-       
-        return view('admin.reports.index',compact('data','request'));
+
+        return view('admin.reports.index', compact('data', 'request'));
     }
 }

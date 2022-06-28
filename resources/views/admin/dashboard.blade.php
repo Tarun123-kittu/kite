@@ -4,7 +4,6 @@
     <div class="content">
         <!-- Animated -->
         <div class="animated fadeIn">
-            <?php print_r($request['creation_date'])?>
             <form method="GET">
                 <div class="row mb-3">
                     <div class="col-md-2">
