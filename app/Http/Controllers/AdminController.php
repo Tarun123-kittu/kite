@@ -448,7 +448,7 @@ class AdminController extends Controller
                     // 'graph' => Overview::groupBy('month')->selectRaw('month(date) as month ,  sum(views) as views , sum(impressions) as impressions')->whereYear('date', date("Y"))->whereIn('deal_id', $deal)->get(),
                     'graph' => Overview::groupBy('date')->selectRaw('date(date) as date,  ifnull(sum(views),0) as views , ifnull(sum(impressions),0) as impressions')->whereBetween('date', [$thirty_days, date('Y-m-d')])->whereIn('deal_id', $deal)->get(),
                     'formats' => Overview::groupBy('format')->selectRaw('format')->get(),
-                    'campaign' => Overview::groupBy('campaign')->selectRaw('campaign')->get(),
+                    'campaign' => Overview::whereIn('deal_id', $deal)->groupBy('campaign')->selectRaw('campaign')->get(),
 
                 ];
             }
