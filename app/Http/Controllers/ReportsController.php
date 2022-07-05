@@ -189,7 +189,7 @@ class ReportsController extends Controller
                 })->get(),
 
 
-                'campaign' => Overview::groupBy('campaign')->selectRaw('campaign')->get(),
+                'campaign' => Overview::whereIn('deal_id', $deal)->groupBy('campaign')->selectRaw('campaign')->get(),
                 'formats' => Overview::groupBy('format')->selectRaw('format')->get(),
                 'advertiser' => Overview::groupBy('advertiser')->selectRaw('advertiser')->get(),
 
