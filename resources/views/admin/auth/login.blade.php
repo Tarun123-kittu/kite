@@ -41,9 +41,13 @@
                 var n = new Noty({
                     text: "Please Wait"
                 }).show();
+                // let postdata=$(this).serializeArray();
+                // console.log(postdata);
+                // return false;
                 $.ajax({
                     type: "POST",
                     url: $(this).attr("action"),
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     data: $(this).serialize(),
                     success: function(response) {
                         n.setType(response.notification.status);

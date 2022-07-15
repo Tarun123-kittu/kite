@@ -2,6 +2,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReportsController;
+use App\Http\Controllers\ReachController;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
@@ -49,6 +50,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
 
     //Report routes
     Route::get('/reports', [ReportsController::class, 'index'])->name('reports');
+
+    Route::get('/me/reach',[ReachController::class, 'index'])->name('reach.report');
 });
 Route::get('/test-api', function(){
     return Hash::make(123456789);

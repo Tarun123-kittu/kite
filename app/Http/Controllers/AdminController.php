@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PasswordReset as MailPasswordReset;
@@ -17,7 +18,14 @@ class AdminController extends Controller
 {
     public function show(Request $request)
     {
-        return view('admin.auth.login');
+        if (Auth::id()) 
+        {
+             return redirect(route('dashboard'));
+        }
+        else
+        {
+            return view('admin.auth.login');
+        }
     }
 
     public function dashboard(Request $request)
@@ -471,15 +479,21 @@ class AdminController extends Controller
 
         $admin = User::where("email", $request->email)->first();
         if ($admin) {
-            if (!Hash::check($request->password, $admin->password)) {
-                return Helpers::response(['ajax' => $request->ajax(), 'status' => 'error', 'message' => "Invalid Password"], 'show.login', 400);
-            }
 
-            AuthAdmin::login($admin);
-            return Helpers::response(['ajax' => $request->ajax(), 'status' => 'success', 'message' => "Login Successful"], 'dashboard', 200);
-        } else {
-            return Helpers::response(['ajax' => $request->ajax(), 'status' => 'error', 'message' => "Invalid Email/Password"], 'show.login', 400);
-        }
+            if(auth()->attempt(array('email' => $request->email, 'password' => $request->password)))
+            {
+                if (!Hash::check($request->password, $admin->password)) {
+                    return Helpers::response(['ajax' => $request->ajax(), 'status' => 'error', 'message' => "Invalid Password"], 'show.login', 400);
+                }
+    
+                AuthAdmin::login($admin);
+                return Helpers::response(['ajax' => $request->ajax(), 'status' => 'success', 'message' => "Login Successful"], 'dashboard', 200);
+            } else {
+                return Helpers::response(['ajax' => $request->ajax(), 'status' => 'error', 'message' => "Invalid Email/Password"], 'show.login', 400);
+            }
+            }else{
+                return Helpers::response(['ajax' => $request->ajax(), 'status' => 'error', 'message' => "Invalid Email/Password"], 'show.login', 400);
+            }     
     }
 
     public function logout(Request $request)
