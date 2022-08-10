@@ -31,6 +31,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/user-profile', [AuthController::class, 'userProfile']);
+    Route::post('/forgot-password', [ApiAdminController::class, 'forgotPassword']);
+
 });
 
 Route::group(['prefix' => 'v1' , 'middleware' => 'auth:api',], function () {

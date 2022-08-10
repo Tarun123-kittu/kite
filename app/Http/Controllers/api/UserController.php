@@ -21,16 +21,19 @@ class UserController extends Controller
 
     public function getUsers(Request $request)
     {
-        $data = User::paginate();
+        $data = User::where('first_name', 'like', '%' . $request->search . '%')
+            ->orWhere('last_name', 'like', '%' . $request->search . '%')
+            ->orWhere('company', 'like', '%' . $request->search . '%')
+            ->paginate($request->per_page);
         return response(['message' => "Success", 'data' => $data], 200);
     }
 
     public function allDeals()
     {
         $deals = Deals::select('deal_id')->groupBy('deal_id')->get();
-        if($deals){
+        if ($deals) {
             return response(['message' => "Success", 'data' => $deals], 200);
-        }else{
+        } else {
             return response(['message' => "Data Not Found"], 404);
         }
         return view('admin.user.add', compact('report'));
@@ -77,9 +80,9 @@ class UserController extends Controller
     public function userById($id)
     {
         $data = User::where('id', $id)->with(['map'])->first();
-        if($data){
-            return response(['message' => "success",'data' => $data], 200);
-        }else{
+        if ($data) {
+            return response(['message' => "success", 'data' => $data], 200);
+        } else {
             return response(['message' => "user not found"], 404);
         }
     }

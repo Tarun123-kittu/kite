@@ -496,7 +496,7 @@ class AdminController extends Controller
             return response(['message' => "Bad Request", 'errors' => $data->errors()->all()], 400);
         }
 
-        $admin = User::where("email", AuthAdmin::user()->email)->first();
+        $admin = User::where("email", auth()->user()->email)->first();
         if ($admin) {
             if (!Hash::check($request->password, $admin->password)) {
                 return response(['message' => "Current Password Didn't Match"], 400);
@@ -506,6 +506,20 @@ class AdminController extends Controller
             $admin->password = Hash::make($request->new_password);
             $admin->save();
             return response(['message' => "Password Updated"], 200);
+        }
+    }
+
+    public function forgotPassword(Request $request)
+    {
+
+        $admin = User::where('email', $request->email)->first();
+        if ($admin) {
+            $admin->password_token = Str::random(30);
+            $admin->save();
+            Mail::to($request->email)->send(new MailPasswordReset($admin));
+            return response(['status' => "success" , 'message' => "Password Reset Link Sent"], 200);
+        } else {
+            return response(['status' => "error" ,'message' => "No User Found"], 404);
         }
     }
 }
