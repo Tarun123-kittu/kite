@@ -4,6 +4,7 @@ use App\Http\Controllers\api\AdminController as ApiAdminController;
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\ReportsController;
 use App\Http\Controllers\api\UserController;
+use App\Http\Controllers\api\CalculatorController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -54,5 +55,9 @@ Route::group(['prefix' => 'v1' , 'middleware' => 'auth:api',], function () {
 
     //Admin routes
     Route::get('/reports', [ReportsController::class, 'index']);
+
+    //Reach Calculator endpoints
+    
     
 });
+Route::get('/products',[CalculatorController::class, 'index']);
