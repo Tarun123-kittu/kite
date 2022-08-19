@@ -10,5 +10,8 @@ class ReachIncidence extends Model
     use HasFactory;
     protected $table='reach_incidence';
     
+    public function agerange(){
+        return $this->belongsTo(ReachAgeRange::class,"ageRangeCode","ageRangeCode");
+    }
 
 }
