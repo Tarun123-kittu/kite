@@ -33,7 +33,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/user-profile', [AuthController::class, 'userProfile']);
     Route::post('/forgot-password', [ApiAdminController::class, 'forgotPassword']);
-
+    Route::post('/abstract', [CalculatorController::class, 'abstract']);
 });
 
 Route::group(['prefix' => 'v1' , 'middleware' => 'auth:api',], function () {
