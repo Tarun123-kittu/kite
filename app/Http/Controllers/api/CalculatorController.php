@@ -14,11 +14,22 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 class CalculatorController extends Controller
 {
+    public $products;
+
+
+
+
+    public function __construct()
+    {
+        $this->products =ReachProduct::all();
+    }
+
+
 
     public function index()
     {
         $data = new \stdClass();
-        $data->products = ReachProduct::all();
+        $data->products = $this->products;
         $data->ageRanges = ReachAgeRange::all();
         $data->countries = Country::all();
         return response(['message' => "success", 'data' => $data], 200);
@@ -27,11 +38,19 @@ class CalculatorController extends Controller
     public function abstract(Request $request)
     {
 
+        $query=$request->all();
         // $abstractyoutube = $this->calculate_proyectada('1', ['BR'], ['M', 'F'], ['406']);
         // $abstractyoutube = $this->usebyage('1', ['BR'], ['M', 'F']);
-        $abstractyoutube = $this->projectedPopulationbyAge('1', ['BR'], ['M', 'F']);
-        return $abstractyoutube;
-
+        // return response(['message' => "success", 'data' =>$query], 200);
+        $allProducts= $this->products;
+        $response=[];
+        foreach($allProducts as $product){
+            $response['incidencia'][str_replace(' ', '', $product->description)]=$this->calculate_incidencia($product->productCode,$query['country'],$query['gender'], $query['age']);
+            $response['poblacion_proyectada'][str_replace(' ', '', $product->description)]=$this->calculate_proyectada($product->productCode,$query['country'],$query['gender'], $query['age']);
+            $response['use_as_per_age'][str_replace(' ', '', $product->description)]=$this->usebyage($product->productCode,$query['country'],$query['gender']);
+            $response['population_projection_by_age'][str_replace(' ', '', $product->description)]=$this->projectedPopulationbyAge($product->productCode,$query['country'],$query['gender']);
+        }
+        return response(['message' => "success", 'data' => $response], 200);
     }
 
     public function reach(Request $request)
@@ -138,14 +157,15 @@ class CalculatorController extends Controller
        $filteredpro= $filterproduct->groupBy('ageRangeCode')->get();
 
        $result=[];
-
+       if(count($filteredpro)>0){
         foreach($allresult as $index=>$value){
-             $filteredindex=array_search($value['ageRangeCode'], (json_decode(json_encode($filteredpro),TRUE)));
-             $filteredvalue= $filteredpro[$filteredindex]['products'];
-             $percentage=number_format((float)(($filteredvalue/$value['products'])*100), 2, '.', '');
-             array_push($result,["name"=>$value["agerange"]["description"], "y"=>$percentage]);
-        }
-
+            $filteredindex=array_search($value['ageRangeCode'], (json_decode(json_encode($filteredpro),TRUE)));
+            $filteredvalue= $filteredpro[$filteredindex]['products'];
+            $percentage=number_format((float)(($filteredvalue/$value['products'])*100), 2, '.', '');
+            array_push($result,["name"=>$value["agerange"]["description"], "y"=>$percentage]);  
+    }
+       }
+      // return $filteredpro;
         return stripslashes(json_encode($result));
     }
 
@@ -160,8 +180,12 @@ class CalculatorController extends Controller
             $connectedpopulation->whereIn('gender', $gender);
         }
          $result=$connectedpopulation->selectRaw("sum(connectedPopulation) as connectedpop, sum(incidence) as incidencepop, ageRangeCode")->with('agerange')->groupBy('ageRangeCode')->get();
-      
-        return $result;
+        $response=[];
+        foreach($result as $res){
+            $response[]=$res->connectedpop+$res->incidencepop;
+        }
+        
+         return stripslashes(json_encode($response));
 
     }
 

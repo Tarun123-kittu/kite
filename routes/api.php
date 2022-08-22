@@ -58,7 +58,7 @@ Route::group(['prefix' => 'v1' , 'middleware' => 'auth:api',], function () {
     Route::post('/abstract', [CalculatorController::class, 'abstract']);
 
     //Reach Calculator endpoints
-    Route::get('/products',[CalculatorController::class, 'index']);
+    Route::get('/index',[CalculatorController::class, 'index']);
 Route::get('/reach',[CalculatorController::class, 'reach']);
 Route::get('/variables',[CalculatorController::class, 'getVariables']);
 Route::post('/variables/update/{id}',[CalculatorController::class, 'updateVariables']);
