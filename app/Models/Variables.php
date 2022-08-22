@@ -9,6 +9,7 @@ class Variables extends Model
 {
     use HasFactory;
     protected $table='reach_variables';
+    public $timestamps = false;
 
     
 }

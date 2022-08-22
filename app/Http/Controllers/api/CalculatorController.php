@@ -39,9 +39,9 @@ class CalculatorController extends Controller
         $totalIncidence = ReachIncidence::select(DB::raw("SUM(incidence)*connectedPopulation as incidence , SUM(connectedPopulation) as connectedPopulation"))->first();
         $variables = Variables::first();
         $data = ReachIncidence::select(DB::raw("SUM(connectedPopulation) as connectedPopulation , 
-        SUM(incidence)*connectedPopulation as incidence , 
-        (SUM(incidence)*connectedPopulation / " . $totalIncidence->incidence . ")*100 as percentage,
-        ".(($request->budget/$variables->cpm)*(1000/$variables->frequency)/$totalIncidence->connectedPopulation)/(100)."
+        ROUND((SUM(incidence)*connectedPopulation),2) as incidence , 
+        ROUND((SUM(incidence)*connectedPopulation / " . $totalIncidence->incidence . ")*100, 2) as percentage,
+        ".ROUND((($request->budget/$variables->cpm)*(1000/$variables->frequency)/$totalIncidence->connectedPopulation)*(100),2)."
         as target_population
         "))
             ->when($request->country, function ($query) use ($request) {
@@ -60,8 +60,8 @@ class CalculatorController extends Controller
 
     public function updateVariables(Request $request , $id){
         $validator = Validator::make($request->all(), [
-            'frequency' => 'required',
-            'cpm' => 'required',
+            'frequency' => 'required|integer',
+            'cpm' => 'required|integer',
             
         ]);
 
