@@ -12,6 +12,7 @@ use App\Models\ReachProduct;
 use App\Models\Variables;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+
 class CalculatorController extends Controller
 {
     public $products;
@@ -21,7 +22,7 @@ class CalculatorController extends Controller
 
     public function __construct()
     {
-        $this->products =ReachProduct::all();
+        $this->products = ReachProduct::all();
     }
 
 
@@ -38,17 +39,17 @@ class CalculatorController extends Controller
     public function abstract(Request $request)
     {
 
-        $query=$request->all();
+        $query = $request->all();
         // $abstractyoutube = $this->calculate_proyectada('1', ['BR'], ['M', 'F'], ['406']);
         // $abstractyoutube = $this->usebyage('1', ['BR'], ['M', 'F']);
         // return response(['message' => "success", 'data' =>$query], 200);
-        $allProducts= $this->products;
-        $response=[];
-        foreach($allProducts as $product){
-            $response['incidencia'][str_replace(' ', '', $product->description)]=$this->calculate_incidencia($product->productCode,$query['country'],$query['gender'], $query['age']);
-            $response['poblacion_proyectada'][str_replace(' ', '', $product->description)]=$this->calculate_proyectada($product->productCode,$query['country'],$query['gender'], $query['age']);
-            $response['use_as_per_age'][str_replace(' ', '', $product->description)]=$this->usebyage($product->productCode,$query['country'],$query['gender']);
-            $response['population_projection_by_age'][str_replace(' ', '', $product->description)]=$this->projectedPopulationbyAge($product->productCode,$query['country'],$query['gender']);
+        $allProducts = $this->products;
+        $response = [];
+        foreach ($allProducts as $product) {
+            $response['incidencia'][str_replace(' ', '', $product->description)] = $this->calculate_incidencia($product->productCode, $query['country'], $query['gender'], $query['age']);
+            $response['poblacion_proyectada'][str_replace(' ', '', $product->description)] = $this->calculate_proyectada($product->productCode, $query['country'], $query['gender'], $query['age']);
+            $response['use_as_per_age'][str_replace(' ', '', $product->description)] = $this->usebyage($product->productCode, $query['country'], $query['gender']);
+            $response['population_projection_by_age'][str_replace(' ', '', $product->description)] = $this->projectedPopulationbyAge($product->productCode, $query['country'], $query['gender']);
         }
         return response(['message' => "success", 'data' => $response], 200);
     }
@@ -60,7 +61,7 @@ class CalculatorController extends Controller
         $data = ReachIncidence::select(DB::raw("SUM(connectedPopulation) as connectedPopulation , 
         ROUND((SUM(projectedPopulation)),2) as incidence , 
         ROUND((SUM(projectedPopulation)/SUM(connectedPopulation) )*100, 2) as percentage,
-        ".ROUND((($request->budget/$variables->cpm)*(1000/$variables->frequency)/$totalIncidence->connectedPopulation)*(100),2)."
+        " . ROUND((($request->budget / $variables->cpm) * (1000 / $variables->frequency) / $totalIncidence->connectedPopulation) * (100), 2) . "
         as target_population
         "))
             ->when($request->country, function ($query) use ($request) {
@@ -73,15 +74,17 @@ class CalculatorController extends Controller
         return response(['message' => "success", 'data' => $data], 200);
     }
 
-    public function getVariables(){
+    public function getVariables()
+    {
         return response(['message' => "success", 'data' => Variables::all()], 200);
     }
 
-    public function updateVariables(Request $request , $id){
+    public function updateVariables(Request $request, $id)
+    {
         $validator = Validator::make($request->all(), [
             'frequency' => 'required|integer',
             'cpm' => 'required|integer',
-            
+
         ]);
 
         if ($validator->fails()) {
@@ -112,8 +115,8 @@ class CalculatorController extends Controller
             $allincidences->whereIn('ageRangeCode', $age);
             $countryincidences->whereIn('ageRangeCode', $age);
         }
-        $results = $allincidences->sum('incidence');
-        $countryresult = $countryincidences->sum('incidence');
+        $results = $allincidences->sum('connectedPopulation');
+        $countryresult = $countryincidences->sum('projectedPopulation');
         $percentage = ($countryresult / $results) * 100;
         return $percentage;
     }
@@ -121,55 +124,48 @@ class CalculatorController extends Controller
     public function calculate_proyectada($product, $country, $gender, $age)
     {
         $connectedpopulation = ReachIncidence::query();
-        $incidence = ReachIncidence::query();
         $connectedpopulation->where('productCode', $product);
-        $incidence->where('productCode', $product);
         if (count($country) > 0) {
             $connectedpopulation->whereIn('countryCode', $country);
-            $incidence->whereIn('countryCode', $country);
         }
         if (count($gender) > 0) {
             $connectedpopulation->whereIn('gender', $gender);
-            $incidence->whereIn('gender', $gender);
         }
         if (count($age) > 0) {
             $connectedpopulation->whereIn('ageRangeCode', $age);
-            $incidence->whereIn('ageRangeCode', $age);
         }
-        $resultcp = $connectedpopulation->sum('connectedPopulation');
-        $resulin = $incidence->sum('incidence');
-        return $resultcp * $resulin;
+        $resultcp = $connectedpopulation->sum('projectedPopulation');
+        return $resultcp;
     }
 
     public function usebyage($product, $country, $gender)
     {
-        $allproductuse=ReachIncidence::query();
-        $filterproduct=ReachIncidence::query();
+        $allproductuse = ReachIncidence::query();
+        $filterproduct = ReachIncidence::query();
 
-        $allresult=$allproductuse->selectRaw("Count(productCode) as products, ageRangeCode")->with('agerange')->groupBy('ageRangeCode')->get();
-        $filterproduct->selectRaw("Count(productCode) as products, ageRangeCode")->where('productCode',$product);
-        if(count($country) > 0){
+        $allresult = $allproductuse->selectRaw("Count(ageRangeCode) as totalAgeRange")->first();
+        $filterproduct->selectRaw("Count(ageRangeCode) as ageRangeCount, ageRangeCode")->where('productCode', $product)->with('agerange');
+        if (count($country) > 0) {
             $filterproduct->whereIn('countryCode', $country);
         }
         if (count($gender) > 0) {
             $filterproduct->whereIn('gender', $gender);
         }
-       $filteredpro= $filterproduct->groupBy('ageRangeCode')->get();
+        $filteredpro = $filterproduct->groupBy('ageRangeCode')->get();
 
-       $result=[];
-       if(count($filteredpro)>0){
-        foreach($allresult as $index=>$value){
-            $filteredindex=array_search($value['ageRangeCode'], (json_decode(json_encode($filteredpro),TRUE)));
-            $filteredvalue= $filteredpro[$filteredindex]['products'];
-            $percentage=number_format((float)(($filteredvalue/$value['products'])*100), 2, '.', '');
-            array_push($result,["name"=>$value["agerange"]["description"], "y"=>$percentage]);  
-    }
-       }
-      // return $filteredpro;
-        return stripslashes(json_encode($result));
+        $result = [];
+
+        if (count($filteredpro) > 0) {
+
+            foreach ($filteredpro as $index => &$value) {
+                $value['percentage'] =  round(($value['ageRangeCount'] / $allresult->totalAgeRange) * 100, 2);
+            }
+        }
+        return json_encode($filteredpro);
     }
 
-    public function projectedPopulationbyAge($product, $country, $gender){
+    public function projectedPopulationbyAge($product, $country, $gender)
+    {
         $connectedpopulation = ReachIncidence::query();
         $connectedpopulation->where('productCode', $product);
 
@@ -179,14 +175,7 @@ class CalculatorController extends Controller
         if (count($gender) > 0) {
             $connectedpopulation->whereIn('gender', $gender);
         }
-         $result=$connectedpopulation->selectRaw("sum(connectedPopulation) as connectedpop, sum(incidence) as incidencepop, ageRangeCode")->with('agerange')->groupBy('ageRangeCode')->get();
-        $response=[];
-        foreach($result as $res){
-            $response[]=$res->connectedpop+$res->incidencepop;
-        }
-        
-         return stripslashes(json_encode($response));
-
+        $result = $connectedpopulation->selectRaw("sum(projectedPopulation) as connectedpop, ageRangeCode")->with('agerange')->groupBy('ageRangeCode')->get();
+        return stripslashes(json_encode($result));
     }
-
 }
