@@ -58,8 +58,8 @@ class CalculatorController extends Controller
         $totalIncidence = ReachIncidence::select(DB::raw("SUM(incidence)*connectedPopulation as incidence , SUM(connectedPopulation) as connectedPopulation"))->first();
         $variables = Variables::first();
         $data = ReachIncidence::select(DB::raw("SUM(connectedPopulation) as connectedPopulation , 
-        ROUND((SUM(incidence)*connectedPopulation),2) as incidence , 
-        ROUND((SUM(incidence)*connectedPopulation / " . $totalIncidence->incidence . ")*100, 2) as percentage,
+        ROUND((SUM(projectedPopulation)),2) as incidence , 
+        ROUND((SUM(projectedPopulation)/SUM(connectedPopulation) )*100, 2) as percentage,
         ".ROUND((($request->budget/$variables->cpm)*(1000/$variables->frequency)/$totalIncidence->connectedPopulation)*(100),2)."
         as target_population
         "))
