@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Country extends Model
 {
     use HasFactory;
-    protected $table='ga_country_codes';
+    protected $table='GA_country_codes';
 
     
 }
