@@ -40,9 +40,6 @@ class CalculatorController extends Controller
     {
 
         $query = $request->all();
-        // $abstractyoutube = $this->calculate_proyectada('1', ['BR'], ['M', 'F'], ['406']);
-        // $abstractyoutube = $this->usebyage('1', ['BR'], ['M', 'F']);
-        // return response(['message' => "success", 'data' =>$query], 200);
         $allProducts = $this->products;
         $response = [];
         foreach ($allProducts as $product) {
@@ -100,24 +97,19 @@ class CalculatorController extends Controller
 
     public function calculate_incidencia($product, $country, $gender, $age)
     {
-        $allincidences = ReachIncidence::query();
-        $countryincidences = ReachIncidence::query();
-        $allincidences->where('productCode', $product);
-        $countryincidences->where('productCode', $product);
+         $countryincidences = ReachIncidence::query();
+         $countryincidences->where('productCode', $product);
         if (count($country) > 0) {
             $countryincidences->whereIn('countryCode', $country);
         }
         if (count($gender) > 0) {
-            $allincidences->whereIn('gender', $gender);
             $countryincidences->whereIn('gender', $gender);
         }
         if (count($age) > 0) {
-            $allincidences->whereIn('ageRangeCode', $age);
             $countryincidences->whereIn('ageRangeCode', $age);
         }
-        $results = $allincidences->sum('connectedPopulation');
-        $countryresult = $countryincidences->sum('projectedPopulation');
-        $percentage = ($countryresult / $results) * 100;
+        $countryresult = $countryincidences->selectRaw('sum(projectedPopulation) as projectedPopulation, sum(connectedPopulation) as connectedPopulation')->first();
+        $percentage = ($countryresult->projectedPopulation / $countryresult->connectedPopulation) * 100;
         return $percentage;
     }
 
